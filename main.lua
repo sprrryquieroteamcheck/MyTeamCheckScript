@@ -1,22 +1,33 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Función para enviar mensaje al chat
 local function sendChatMessage(message)
-    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+    local success, err = pcall(function()
+        game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+    end)
+    if not success then
+        warn("[TeamCheck Error]: "..err)
+    end
 end
 
--- Equipos permitidos (Ajusta los nombres exactos si es necesario)
+sendChatMessage("✅ Team Check iniciado...")
+
 local allowedTeams = {
     ["Assassins"] = true,
     ["Sheriffs"] = true
 }
 
 if LocalPlayer.Team and allowedTeams[LocalPlayer.Team.Name] then
-    sendChatMessage("✅ Team Check: Estás en el equipo permitido (" .. LocalPlayer.Team.Name .. "). Ejecutando el script...")
+    sendChatMessage("✅ Estás en el equipo correcto: " .. LocalPlayer.Team.Name .. ". Cargando el aimbot...")
 
-    -- Carga el aimbot original desde GitHub
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/agresiv111/script/refs/heads/main/main.lua"))()
+    -- Cargar el aimbot original desde GitHub
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/agresiv111/script/refs/heads/main/main.lua"))()
+    end)
+
+    if not success then
+        sendChatMessage("❌ Error al cargar el script externo: "..tostring(err))
+    end
 else
-    sendChatMessage("❌ Team Check: No estás en un equipo válido. No se ejecutará el script.")
+    sendChatMessage("❌ No estás en un equipo permitido. El aimbot no se ejecutará.")
 end
